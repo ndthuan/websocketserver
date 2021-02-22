@@ -27,7 +27,7 @@ func TestServer_On(t *testing.T) {
 		{
 			name: "No handlers",
 			args: []args{},
-			expectedHandlerCount: 1,
+			expectedHandlerCount: 0,
 		},
 		{
 			name: "Single handler",
