@@ -1,2 +1,2 @@
-# websocket-command-handler
-Standardized websocket command handling in Go
+# websocketserver
+Websocketserver helps to organize code for handling different formats of websocket messages sent by clients.
