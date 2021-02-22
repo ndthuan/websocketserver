@@ -25,8 +25,15 @@ sleep 10
 kill $SERVER_PID
 
 grep -q "http server started on" /tmp/output || (echo "server not started"; exit 1)
-grep -q "Hi there, this is private message to you" /tmp/output || (echo "private message not sent"; exit 1)
+
+clientsConnected=$(grep -c 'Hi there, this is private message to you. Welcome!' /tmp/output)
+if [ "$clientsConnected" != "2" ]; then
+  echo "there must be 2 clients connected, found: $clientsConnected"
+  exit 1
+fi
+
 grep -q "Everyone, please welcome" /tmp/output || (echo "broadcast messages not sent"; exit 1)
+
 grep -q "how are you" /tmp/output || (echo "standalone runner's messages not sent"; exit 1)
 
 echo "All good"
