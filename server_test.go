@@ -25,8 +25,8 @@ func TestServer_On(t *testing.T) {
 		expectedHandlerCount int
 	}{
 		{
-			name: "No handlers",
-			args: []args{},
+			name:                 "No handlers",
+			args:                 []args{},
 			expectedHandlerCount: 0,
 		},
 		{
