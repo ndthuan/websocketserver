@@ -1,11 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/ndthuan/websocketserver"
 	"os"
+	"time"
 )
 
 func main() {
@@ -45,33 +45,12 @@ func main() {
 		}
 	}()
 
-	go func() {
-		s := bufio.NewScanner(os.Stdin)
+	time.Sleep(10 * time.Second)
 
-		for {
-			if !s.Scan() {
-				break
-			}
-
-			input := s.Text()
-
-			switch input {
-			case "bye":
-				c.WriteJSON(websocketserver.Message{
-					Type:    "logout",
-					Payload: "Gotta go",
-				})
-
-				quit <- 0
-				break
-			default:
-				c.WriteJSON(websocketserver.Message{
-					Type:    "human-message",
-					Payload: input,
-				})
-			}
-		}
-	}()
+	c.WriteJSON(websocketserver.Message{
+		Type:    "logout",
+		Payload: "Gotta go",
+	})
 
 	select {
 	case <-quit:
