@@ -22,6 +22,10 @@ type ConnectionCallback func(conn *websocket.Conn, server *Server) error
 //It can be used to periodically send messages to connected clients without receiving a message.
 type StandaloneRunner func(server *Server)
 
+//BroadcastMessageBuilder is the callback on each connection when the server broadcasts. It should return true or false
+//to signal if the message should be sent to that client.
+type BroadcastMessageBuilder func(conn *websocket.Conn) (*Message, bool)
+
 //Server acts like a router that routes messages to handlers based on type specified in each message.
 type Server struct {
 	Upgrader         websocket.Upgrader
@@ -84,7 +88,7 @@ func (s *Server) SetStandaloneRunner(runner StandaloneRunner) {
 //Broadcast sends messages to every connected client.
 //The messageBuilder func can build a different message for a different client,
 //it can also signal if the message should be sent to that client.
-func (s *Server) Broadcast(messageBuilder func(conn *websocket.Conn) (*Message, bool)) {
+func (s *Server) Broadcast(messageBuilder BroadcastMessageBuilder) {
 	s.locker.RLock()
 	defer s.locker.RUnlock()
 

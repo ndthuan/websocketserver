@@ -95,26 +95,28 @@ func humanMessageHandler() websocketserver.MessageHandler {
 	}
 }
 
+func broadcastMessageBuilder(conn *websocket.Conn) (*websocketserver.Message, bool) {
+	if username, loggedIn := authenticatedConnections[conn]; loggedIn {
+		now, _ := time.Now().MarshalText()
+
+		msg := &websocketserver.Message{
+			Type:    "system-broadcast",
+			Payload: fmt.Sprintf("Hi %s, now is %s, how are you?", username, now),
+		}
+
+		return msg, true
+	}
+
+	return nil, false
+}
+
 func standaloneRunner() websocketserver.StandaloneRunner {
 	return func(server *websocketserver.Server) {
 		log.Println("Standalone runner was started")
 		for {
 			time.Sleep(time.Second)
 
-			server.Broadcast(func(conn *websocket.Conn) (*websocketserver.Message, bool) {
-				if username, loggedIn := authenticatedConnections[conn]; loggedIn {
-					now, _ := time.Now().MarshalText()
-
-					msg := &websocketserver.Message{
-						Type:    "system-broadcast",
-						Payload: fmt.Sprintf("Hi %s, now is %s, how are you?", username, now),
-					}
-
-					return msg, true
-				}
-
-				return nil, false
-			})
+			server.Broadcast(broadcastMessageBuilder)
 		}
 	}
 }
