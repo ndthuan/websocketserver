@@ -112,9 +112,7 @@ func (s *Server) Start(w http.ResponseWriter, r *http.Request, responseHeader ht
 
 	if s.standaloneRunner != nil {
 		s.once.Do(func() {
-			go func() {
-				s.standaloneRunner(s)
-			}()
+			go s.standaloneRunner(s)
 		})
 	}
 
