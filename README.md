@@ -6,7 +6,7 @@ Websocketserver helps to organize code for handling different formats of websock
 ```json
 {
   "type": "message-type",
-  "payload": "any string, usually json formatted"
+  "payload": "any string, usually json-encoded"
 }
 ```
 * Messages are routed to registered handlers based on message type
@@ -20,6 +20,11 @@ wsServer.On("human-message", humanMessageHandler())
 wsServer.SetStandaloneRunner(standaloneRunner())
 ```
 * Can be integrated with any web server framework
+* Hooks for connection events
+```go
+wsServer.OnConnected(connectedCallback())
+wsServer.OnDisconnected(disconnectedCallback())
+```
 
 # Examples
 See [a basic chat server example](./examples/chat-server/).
