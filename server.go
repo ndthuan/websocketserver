@@ -60,8 +60,8 @@ func (s *Server) Handlers() map[string]MessageHandler {
 	return s.handlers
 }
 
-//OnAll registers a catch-all handler that will be executed on all message types. If there is a specific handler
-//registered on a type, this will be executed after.
+//OnAll registers a catch-all handler that will be executed on all message types.
+//If there is a specific handler registered on a type, this will be executed after.
 func (s *Server) OnAll(handler MessageHandler) {
 	s.allHandler = handler
 }

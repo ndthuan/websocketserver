@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/ndthuan/websocketserver"
-	"math/rand"
+	"log"
 	"time"
 )
 
@@ -31,6 +31,7 @@ func broadcast(msg string, excluded *websocket.Conn) {
 
 func loginHandler() websocketserver.MessageHandler {
 	return func(connection *websocket.Conn, listener *websocketserver.Server, message websocketserver.Message) error {
+		log.Println("Login handler triggered")
 		username := message.Payload
 
 		authenticatedConnections[connection] = username
@@ -43,9 +44,14 @@ func loginHandler() websocketserver.MessageHandler {
 
 func logoutHandler() websocketserver.MessageHandler {
 	return func(connection *websocket.Conn, listener *websocketserver.Server, message websocketserver.Message) error {
+		log.Println("Logout handler triggered")
 		username, loggedIn := authenticatedConnections[connection]
 
 		if loggedIn {
+			connection.WriteJSON(websocketserver.Message{
+				Type:    "system-message",
+				Payload: "Bye-bye, " + username,
+			})
 			delete(authenticatedConnections, connection)
 			broadcast(fmt.Sprintf("%s left the room", username), connection)
 			_ = connection.WriteMessage(websocket.CloseMessage, []byte{})
@@ -57,9 +63,10 @@ func logoutHandler() websocketserver.MessageHandler {
 
 func disconnectedCallback() websocketserver.ConnectionCallback {
 	return func(connection *websocket.Conn, listener *websocketserver.Server) error {
+		log.Println("Client disconnected")
 		loggedInUser, already := authenticatedConnections[connection]
 		if already {
-			broadcast(fmt.Sprintf("%s disconnected", loggedInUser), connection)
+			broadcast(fmt.Sprintf("%s was disconnected", loggedInUser), connection)
 			delete(authenticatedConnections, connection)
 		}
 		return nil
@@ -68,9 +75,10 @@ func disconnectedCallback() websocketserver.ConnectionCallback {
 
 func connectedCallback() websocketserver.ConnectionCallback {
 	return func(connection *websocket.Conn, listener *websocketserver.Server) error {
+		log.Println("Client connected")
 		return connection.WriteJSON(websocketserver.Message{
 			Type:    "system-message",
-			Payload: "Hi there, this is private message to you. Welcome!",
+			Payload: "You are connected",
 		})
 	}
 }
@@ -89,8 +97,9 @@ func humanMessageHandler() websocketserver.MessageHandler {
 
 func standaloneRunner() websocketserver.StandaloneRunner {
 	return func(server *websocketserver.Server) {
+		log.Println("Standalone runner was started")
 		for {
-			time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
+			time.Sleep(time.Second)
 
 			server.Broadcast(func(conn *websocket.Conn) (*websocketserver.Message, bool) {
 				if username, loggedIn := authenticatedConnections[conn]; loggedIn {
