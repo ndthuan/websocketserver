@@ -28,6 +28,7 @@ wsServer.On("login", loginHandler())
 wsServer.On("logout", logoutHandler())
 wsServer.On("human-message", humanMessageHandler())
 ```
+* Ability to broadcast customized messages to all connected clients (see below)
 * A standalone runner can be started in a separate goroutine to proactively broadcast messages to all clients without receiving a message
 ```go
 package main
